@@ -17,6 +17,7 @@ import net.orendigo.commandstands.command.commands.InfoCommand;
 import net.orendigo.commandstands.command.commands.MoveCommand;
 import net.orendigo.commandstands.command.commands.NameCommand;
 import net.orendigo.commandstands.command.commands.OffHandCommand;
+import net.orendigo.commandstands.command.commands.PartsCommand;
 import net.orendigo.commandstands.command.commands.ResetCommand;
 import net.orendigo.commandstands.command.commands.RotateCommand;
 import net.orendigo.commandstands.command.commands.ShiftCommand;
@@ -52,6 +53,7 @@ public class CommandManager implements CommandExecutor {
     public String move;
     public String clone;
     public String toggle;
+    public String parts;
     
     public CommandManager() {
         this.commands = new ArrayList<>();
@@ -69,6 +71,7 @@ public class CommandManager implements CommandExecutor {
         this.move = "move";
         this.clone = "clone";
         this.toggle = "toggle";
+        this.parts = "parts";
     }
     
     public void setup() {
@@ -85,6 +88,7 @@ public class CommandManager implements CommandExecutor {
         this.commands.add(new MoveCommand());
         this.commands.add(new CloneCommand());
         this.commands.add(new ToggleCommand());
+        this.commands.add(new PartsCommand());
     }
     
     public boolean onCommand(final CommandSender sender, final Command command, final String s, final String[] args) {
