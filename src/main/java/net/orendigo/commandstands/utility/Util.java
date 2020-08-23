@@ -21,6 +21,10 @@ import org.bukkit.util.Vector;
  */
 public class Util {
     
+    /*  This is pretty much a reimplementation of Skript's getTarget method, which
+     *  I used in the first version of this plugin when it was wrriten in skript
+     *  https://github.com/Njol/Skript/blob/master/src/main/java/ch/njol/skript/util/Utils.java#L109
+     */ 
     public static <T extends Entity> T getTarget(final Player sender) {
         T target = null;
         double targetDistanceSquared = 0.0;

@@ -1,15 +1,13 @@
 
 /**
- * CenterCommand Class
+ * RideCommand Class
  */
 
 package net.orendigo.commandstands.command.commands;
 
 import net.orendigo.commandstands.CommandStands;
 import net.orendigo.commandstands.utility.Util;
-
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -17,15 +15,15 @@ import org.bukkit.entity.Player;
 /**
  * @author Orendigo
  */
-public class CenterCommand extends SubCommand{
-    
+public class RideCommand extends SubCommand {
+
     private final CommandStands plugin;
     private ArmorStand targetEntity;
     
-    public CenterCommand() {
+    public RideCommand() {
         this.plugin = CommandStands.getInstance();
     }
-    
+
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
@@ -41,16 +39,12 @@ public class CenterCommand extends SubCommand{
 
     @Override
     public void onCommand(Player player, String[] args) {
-        final Location newLocation = targetEntity.getLocation();
-        newLocation.setX(Math.floor(newLocation.getX()) + 0.4999999999);
-        newLocation.setY(Math.floor(newLocation.getY()));
-        newLocation.setZ(Math.floor(newLocation.getZ()) + 0.4999999999);
-        targetEntity.teleport(newLocation);
+        targetEntity.addPassenger(player);
     }
 
     @Override
     public String name() {
-        return this.plugin.commandManager.center;
+        return this.plugin.commandManager.ride;
     }
 
     @Override
@@ -62,4 +56,5 @@ public class CenterCommand extends SubCommand{
     public String[] aliases() {
         return new String[0];
     }
+
 }

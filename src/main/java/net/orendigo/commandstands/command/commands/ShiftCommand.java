@@ -117,7 +117,7 @@ public class ShiftCommand extends SubCommand {
 
     @Override
     public String[] aliases() {
-        return new String[0];
+        return new String[]{"set"};
     }
 
 }

@@ -70,16 +70,31 @@ public class ToggleCommand extends SubCommand {
                 targetEntity.setVisible(bolVal);
             else 
                 targetEntity.setVisible(!targetEntity.isVisible());
-        else if (args[0].toLowerCase().contains("vulnerable"))
+        else if (args[0].toLowerCase().equalsIgnoreCase("vulnerable"))
+            if (bolVal != null)
+                targetEntity.setInvulnerable(!bolVal);
+            else
+                targetEntity.setInvulnerable(!targetEntity.isInvulnerable());
+        else if (args[0].toLowerCase().equalsIgnoreCase("invulnerable")) 
             if (bolVal != null)
                 targetEntity.setInvulnerable(bolVal);
             else
                 targetEntity.setInvulnerable(!targetEntity.isInvulnerable());
-        else if (args[0].toLowerCase().contains("invulnerable")) 
-            if (bolVal != null)
-                targetEntity.setInvulnerable(bolVal);
+        else if (args[0].toLowerCase().contains("fire")) {
+            if (bolVal != null) {
+                if (args[1].equalsIgnoreCase("true"))
+                    targetEntity.setFireTicks(999999999);
+                else if (args[1].equalsIgnoreCase("false"))
+                    targetEntity.setFireTicks(0);
+                }
             else
-                targetEntity.setInvulnerable(!targetEntity.isInvulnerable());
+                if (targetEntity.getFireTicks() > 0)
+                    targetEntity.setFireTicks(0);
+                else {
+                    targetEntity.setInvulnerable(true);
+                    targetEntity.setFireTicks(999999999);
+                }
+        }
     }
 
     @Override
@@ -94,7 +109,7 @@ public class ToggleCommand extends SubCommand {
 
     @Override
     public String[] aliases() {
-        return new String[] {"arms", "small", "size", "base", "plate", "gravity", "grav", "visible", "invulnerable", "vulnerable"};
+        return new String[] {"arms", "small", "size", "base", "plate", "gravity", "grav", "visible", "invulnerable", "vulnerable", "fire"};
     }
-
+    
 }

@@ -50,6 +50,7 @@ public class ResetCommand extends SubCommand {
         targetEntity.setBodyPose(EulerAngle.ZERO);
         targetEntity.setRightArmPose(EulerAngle.ZERO);
         targetEntity.setLeftArmPose(EulerAngle.ZERO);
+        targetEntity.setLeftLegPose(EulerAngle.ZERO);
         targetEntity.setRightLegPose(EulerAngle.ZERO);
         targetEntity.setRightLegPose(EulerAngle.ZERO);
         targetEntity.teleport(entitytLocation);

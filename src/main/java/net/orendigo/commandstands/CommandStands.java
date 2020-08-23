@@ -8,9 +8,11 @@ package net.orendigo.commandstands;
 import java.io.File;
 import java.io.IOException;
 
-import net.orendigo.commandstands.command.CommandManager;
-import net.orendigo.commandstands.externalmanagers.WorldGuardManager;
+import net.orendigo.commandstands.command.commands.CommandManager;
 import net.orendigo.commandstands.event.EventManager;
+
+import net.orendigo.commandstands.externalmanagers.WorldGuardManager;
+import net.orendigo.commandstands.externalmanagers.ProtocolLibManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -34,10 +36,23 @@ public class CommandStands extends JavaPlugin implements Listener {
     
     // managers for external plugins
     public WorldGuardManager worldGuardManager;
+    public ProtocolLibManager protocolLibManager;
     
-    public void onLoad() {
-        setInstance(this);
-        loadWorldGuard();
+    // attempt to load ProtocolLib
+    private void loadProtocolLib() {
+        try {
+            Class.forName("com.comphenix.protocol.ProtocolManager");
+            Class.forName("com.comphenix.protocol.ProtocolLibrary");
+            protocolLibManager = new ProtocolLibManager();
+            protocolLibManager.setup();
+            getLogger().info("Found ProtocolLib! '/as mark' is now enabled!");
+        } catch (ClassNotFoundException e) {
+            getLogger().info("Missing ProtocolLib! '/as mark' is disabled!");
+        }
+    }
+    
+    public boolean hasProtocolLib() {
+        return protocolLibManager != null;
     }
     
     // attempting to load WorldGuard / WorldEdit
@@ -57,10 +72,21 @@ public class CommandStands extends JavaPlugin implements Listener {
         //if (worldGuardManager != null) worldGuardManager.register();
     }
     
+    public boolean hasWorldGuard() {
+        return worldGuardManager != null;
+    }
+    
+    public void onLoad() {
+        setInstance(this);
+        loadWorldGuard();
+        loadProtocolLib();
+    }
+    
     public void onEnable() {
         createMessagesConfig();
         Bukkit.getPluginManager().registerEvents(new EventManager(), this);
         (this.commandManager = new CommandManager()).setup();
+        //this.protocolManager = ProtocolLibrary.getProtocolManager();
         System.out.println("CommandStands loaded successfully!");
     }
     
@@ -78,10 +104,6 @@ public class CommandStands extends JavaPlugin implements Listener {
     
     public WorldGuardManager getWorldGuardManager() {
         return this.worldGuardManager;
-    }
-    
-    public boolean hasWorldGuard() {
-        return worldGuardManager != null;
     }
     
     public void log(String info) {

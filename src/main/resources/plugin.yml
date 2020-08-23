@@ -1,10 +1,10 @@
 name: CommandStands
 main: net.orendigo.commandstands.CommandStands
-version: '1.4 (1.16)'
+version: '1.5 (1.16.2)'
 author: Orendigo
 api-version: 1.16
 description: Edit armour stands using commands
-softdepend: [WorldGuard, WorldEdit]
+softdepend: [WorldGuard, WorldEdit, ProtocolLib]
 
 commands:
     as:

@@ -5,10 +5,13 @@
  */
 package net.orendigo.commandstands.event;
 
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.function.Supplier;
 
 import net.orendigo.commandstands.CommandStands;
 import net.orendigo.commandstands.utility.Util;
+import org.bukkit.Bukkit;
 
 import static org.bukkit.Bukkit.getServer;
 
@@ -38,6 +41,17 @@ public class EventManager implements Listener {
         this.plugin = CommandStands.getInstance();
     }
     
+    private final Method[] methods = ((Supplier<Method[]>) () -> {
+        try {
+            Method getHandle = Class.forName(Bukkit.getServer().getClass().getPackage().getName() + ".entity.CraftEntity").getDeclaredMethod("getHandle");
+            return new Method[] {
+                getHandle, getHandle.getReturnType().getDeclaredMethod("setPositionRotation", double.class, double.class, double.class, float.class, float.class)
+            };
+        } catch (Exception ex) {
+            return null;
+        }
+    }).get();
+    
     @EventHandler
     public void onMove(final PlayerMoveEvent e) {
         final Player player = e.getPlayer();
@@ -45,7 +59,9 @@ public class EventManager implements Listener {
             final Entity nearEntity = Util.eventTargetFinder(player);
             if (nearEntity != null) {
                 final Location twoInFront = player.getLocation().add(player.getLocation().getDirection().multiply(2)).add(0.0, 1.0, 0.0);
-                nearEntity.teleport(twoInFront);
+                try {
+                    methods[1].invoke(methods[0].invoke(nearEntity), twoInFront.getX(), twoInFront.getY(), twoInFront.getZ(), twoInFront.getYaw(), twoInFront.getPitch());
+                } catch (Exception ex) {}
             }
         }
     }
@@ -132,5 +148,5 @@ public class EventManager implements Listener {
         targetEntity.removeMetadata("PickUpPlayer", this.plugin);
         targetEntity.removeMetadata("MoveRotation", this.plugin);
     }
-    
+
 }

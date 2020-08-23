@@ -3,32 +3,20 @@
  * CommandManager Class
  */
 
-package net.orendigo.commandstands.command;
+package net.orendigo.commandstands.command.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import net.orendigo.commandstands.CommandStands;
-import net.orendigo.commandstands.command.commands.CenterCommand;
-import net.orendigo.commandstands.command.commands.CloneCommand;
-import net.orendigo.commandstands.command.commands.HatCommand;
-import net.orendigo.commandstands.command.commands.HelpCommand;
-import net.orendigo.commandstands.command.commands.InfoCommand;
-import net.orendigo.commandstands.command.commands.MoveCommand;
-import net.orendigo.commandstands.command.commands.NameCommand;
-import net.orendigo.commandstands.command.commands.OffHandCommand;
-import net.orendigo.commandstands.command.commands.PartsCommand;
-import net.orendigo.commandstands.command.commands.ResetCommand;
-import net.orendigo.commandstands.command.commands.RotateCommand;
-import net.orendigo.commandstands.command.commands.ShiftCommand;
-import net.orendigo.commandstands.command.commands.SubCommand;
-import net.orendigo.commandstands.command.commands.ToggleCommand;
 import net.orendigo.commandstands.utility.Util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -36,7 +24,11 @@ import org.bukkit.entity.Player;
 /**
  * @author Orendigo
  */
-public class CommandManager implements CommandExecutor {
+public class CommandManager implements CommandExecutor,TabExecutor {
+    
+    private static final List<String> mainCommands = new ArrayList<>(Arrays.asList("center", "clone", "hat", "info", "move", "name", "offhand", "reset", "ride", "shift", "set"));
+    private static final List<String> toggleCommands = new ArrayList<>(Arrays.asList("arms", "small", "plate", "gravity", "visible", "invulnerable", "vulnerable", "fire"));
+    private static final List<String> rotateCommands = new ArrayList<>(Arrays.asList("rightarm", "leftarm", "rightleg", "leftleg", "head", "body"));
     
     private final ArrayList<SubCommand> commands;
     private final CommandStands plugin;
@@ -54,6 +46,8 @@ public class CommandManager implements CommandExecutor {
     public String clone;
     public String toggle;
     public String parts;
+    public String ride;
+    public String mark;
     
     public CommandManager() {
         this.commands = new ArrayList<>();
@@ -72,10 +66,13 @@ public class CommandManager implements CommandExecutor {
         this.clone = "clone";
         this.toggle = "toggle";
         this.parts = "parts";
+        this.ride = "ride";
+        this.mark = "mark";
     }
     
     public void setup() {
         this.plugin.getCommand(this.main).setExecutor(this);
+        this.plugin.getCommand(this.main).setTabCompleter(this);
         this.commands.add(new HelpCommand());
         this.commands.add(new ResetCommand());
         this.commands.add(new CenterCommand());
@@ -89,13 +86,21 @@ public class CommandManager implements CommandExecutor {
         this.commands.add(new CloneCommand());
         this.commands.add(new ToggleCommand());
         this.commands.add(new PartsCommand());
+        this.commands.add(new RideCommand());
+        if (this.plugin.hasProtocolLib()) {
+            this.commands.add(new MarkCommand());
+            CommandManager.mainCommands.add("mark");
+        }
     }
     
     public boolean onCommand(final CommandSender sender, final Command command, final String s, final String[] args) {
         if (command.getName().equalsIgnoreCase(this.main)) {
             // if input command is just main command
             if (args.length == 0) {
-                new HelpCommand().onCommand(sender, new String[] {"as", "1"} );
+                for (SubCommand cmd : this.commands) {
+                    if (cmd instanceof HelpCommand) 
+                        cmd.onCommand(sender, new String[] {"as", "1"} );
+                }
                 return true;
             }
             
@@ -109,7 +114,7 @@ public class CommandManager implements CommandExecutor {
                 return true;
             }
             
-            if (!(target instanceof HelpCommand)) {
+            if (!(target instanceof HelpCommand || target instanceof MarkCommand || ((Player) sender).hasMetadata("PickUpStand") )) {
                 final Entity targetEntity = Util.getTarget((Player) sender);
                 // ensuring target is an armor stand
                 if (!(targetEntity instanceof ArmorStand)) {
@@ -140,7 +145,7 @@ public class CommandManager implements CommandExecutor {
             }
             
             // attempt to run onCommand method from input
-            final ArrayList<String> arrayList = new ArrayList<String>();
+            final ArrayList<String> arrayList = new ArrayList<>();
             arrayList.addAll(Arrays.asList(args));
             arrayList.remove(0);
             try {
@@ -152,7 +157,6 @@ public class CommandManager implements CommandExecutor {
                     this.plugin.getMessagesConfig().getString("Messages.prefix") +
                     this.plugin.getMessagesConfig().getString("Messages.error-occured"))
                 );
-                e.printStackTrace();
             }
         }
         return true;
@@ -168,6 +172,26 @@ public class CommandManager implements CommandExecutor {
                     return subCmd;
         }
         return null;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        final List<String> completions = new ArrayList<>();
+        if (args.length == 1) {
+            completions.addAll(mainCommands);
+            completions.addAll(toggleCommands);
+            completions.addAll(rotateCommands);
+        }
+        else if (toggleCommands.contains(args[0])){
+            completions.add("true");
+            completions.add("false");
+        }
+        else if (rotateCommands.contains(args[0]) && args.length == 2) {
+            completions.add("x");
+            completions.add("y");
+            completions.add("z");
+        }
+        return completions;
     }
 
     

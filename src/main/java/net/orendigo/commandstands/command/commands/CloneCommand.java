@@ -69,6 +69,8 @@ public class CloneCommand extends SubCommand {
             clone.setRightLegPose(targetEntity.getRightLegPose());
             clone.setSmall(targetEntity.isSmall());
             clone.setVisible(targetEntity.isVisible());
+            clone.setCustomNameVisible(targetEntity.isCustomNameVisible());
+            clone.setCustomName(targetEntity.getCustomName());
             new MoveCommand().onCommand(player, clone);
             return;
         }
